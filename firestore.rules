@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global helpers
+    function isSignedIn() { return request.auth != null; }
+    
+    // Role checks
+    function isStaff() { 
+      return isSignedIn() && 
+             (request.auth.token.email == 'telimahesh36@gmail.com' || 
+              (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+               get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'branch_manager', 'inventory_clerk']));
+    }
+
+    // --- Collections ---
+
+    // PUBLIC ACCESS
+    match /categories/{categoryId} { allow read: if true; allow write: if isStaff(); }
+    match /products/{productId} { allow read: if true; allow write: if isStaff(); }
+    match /pages/{pageId} { allow read: if true; allow write: if isStaff(); }
+    match /reviews/{reviewId} { allow read: if true; }
+
+    // USERS
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isStaff());
+      allow list: if isStaff();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isSignedIn() && request.auth.uid == userId;
+      allow delete: if isStaff();
+    }
+
+    // BRANCHES
+    match /branches/{branchId} {
+      allow read: if isSignedIn();
+      allow write: if isStaff();
+    }
+
+    // INVENTORY
+    match /inventory/{inventoryId} {
+      allow read, write: if isStaff();
+    }
+
+    // ORDERS
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && (resource.data.user_id == request.auth.uid || isStaff());
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && (resource.data.user_id == request.auth.uid || isStaff());
+    }
+
+    match /orders/{orderId}/items/{itemId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

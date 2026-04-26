@@ -1,0 +1,146 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "whatsapp_no": { "type": "string" },
+        "role": { "type": "string", "enum": ["customer", "admin", "branch_manager", "inventory_clerk"] },
+        "branch_id": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "whatsapp_no", "role"]
+    },
+    "Branch": {
+      "title": "Branch",
+      "description": "Store branches",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "location": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "inactive"] }
+      },
+      "required": ["name", "location", "status"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Product categories",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "image": { "type": "string" },
+        "slug": { "type": "string" }
+      },
+      "required": ["name", "slug"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Store products",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "cat_id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "variations": { "type": "object" },
+        "image": { "type": "string" },
+        "brand": { "type": "string" },
+        "rating": { "type": "number" },
+        "reviews_count": { "type": "number" },
+        "stock": { "type": "number" }
+      },
+      "required": ["cat_id", "name", "price"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Product reviews",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "product_id": { "type": "string" },
+        "user_id": { "type": "string" },
+        "user_name": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["product_id", "user_id", "rating"]
+    },
+    "Inventory": {
+      "title": "Inventory",
+      "description": "Stock levels per branch",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "product_id": { "type": "string" },
+        "branch_id": { "type": "string" },
+        "stock_count": { "type": "number" },
+        "low_stock_mark": { "type": "number" }
+      },
+      "required": ["product_id", "branch_id", "stock_count"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer orders",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "user_id": { "type": "string" },
+        "branch_id": { "type": "string" },
+        "total": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "packing", "out_for_delivery", "completed", "cancelled"] },
+        "payment_method": { "type": "string" },
+        "type": { "type": "string", "enum": ["POS", "Online"] },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["branch_id", "total", "status", "type"]
+    },
+    "OrderItem": {
+      "title": "OrderItem",
+      "description": "Individual items in an order",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "order_id": { "type": "string" },
+        "product_id": { "type": "string" },
+        "qty": { "type": "number" },
+        "price": { "type": "number" },
+        "attributes": { "type": "object" }
+      },
+      "required": ["order_id", "product_id", "qty", "price"]
+    },
+    "Page": {
+      "title": "Page",
+      "description": "Dynamic content pages",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "slug": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "published"] },
+        "created_at": { "type": "string", "format": "date-time" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["slug", "title", "content", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": "User", "description": "User profiles" },
+    "/branches/{branchId}": { "schema": "Branch", "description": "Outlets" },
+    "/categories/{categoryId}": { "schema": "Category", "description": "Product categories" },
+    "/products/{productId}": { "schema": "Product", "description": "Product catalog" },
+    "/inventory/{inventoryId}": { "schema": "Inventory", "description": "Branch-specific stock" },
+    "/orders/{orderId}": { "schema": "Order", "description": "Sales records" },
+    "/orders/{orderId}/items/{itemId}": { "schema": "OrderItem", "description": "Line items" },
+    "/pages/{pageId}": { "schema": "Page", "description": "Dynamic CMS pages" },
+    "/reviews/{reviewId}": { "schema": "Review", "description": "Product reviews" }
+  }
+}

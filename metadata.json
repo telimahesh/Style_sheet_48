@@ -1,0 +1,6 @@
+{
+  "name": "lockingstyle",
+  "description": "An ultra-modern mobile-first PWA for retail with POS, inventory management, and WhatsApp integration. Built with a focus on ease of use and security.",
+  "requestFramePermissions": ["notifications"],
+  "majorCapabilities": []
+}
