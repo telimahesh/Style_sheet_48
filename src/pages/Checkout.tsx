@@ -41,75 +41,72 @@ export default function Checkout() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
+    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24">
       <div className="space-y-2">
-        <h1 className="text-4xl font-black italic uppercase tracking-tighter">Finalize <span className="text-whatsapp">Deployment</span></h1>
-        <p className="text-slate-400 text-sm font-medium">Provide your coordinates mapping for hardware delivery</p>
+        <h1 className="text-3xl font-black italic uppercase tracking-tighter leading-none">ORDER <span className="text-whatsapp">LOGISTICS</span></h1>
+        <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest leading-none">Finalizing Procurement Dispatch sequence</p>
       </div>
 
       <form onSubmit={handleFinish} className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         <div className="lg:col-span-3 space-y-6">
           {/* Shipping Info */}
-          <div className="bg-slate-800/40 border border-slate-700/50 p-8 rounded-[2.5rem] space-y-6 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-8 opacity-5"><MapPin className="w-20 h-20" /></div>
-            <h2 className="text-xl font-black italic uppercase tracking-tighter flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-whatsapp" /> Delivery Vector
+          <div className="bg-slate-900 border border-white/5 p-6 rounded-3xl space-y-6 relative overflow-hidden group">
+            <h2 className="text-sm font-black uppercase tracking-widest text-slate-100 flex items-center gap-3">
+              <MapPin className="w-5 h-5 text-whatsapp" /> Dispatch Coordinates
             </h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5 flex-1">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">First Marker</label>
-                <input name="firstName" required type="text" placeholder="First Name" className="w-full bg-slate-900/60 border border-slate-700 rounded-xl py-3.5 px-4 text-sm font-medium focus:border-whatsapp/50 outline-none transition-all" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">First Agent</label>
+                <input name="firstName" required type="text" placeholder="First Name" className="w-full bg-slate-950 border border-white/5 rounded-xl py-3.5 px-5 text-xs font-black uppercase tracking-widest focus:border-whatsapp/50 outline-none transition-all" />
               </div>
-              <div className="space-y-1.5 flex-1">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Last Marker</label>
-                <input required type="text" placeholder="Last Name" className="w-full bg-slate-900/60 border border-slate-700 rounded-xl py-3.5 px-4 text-sm font-medium focus:border-whatsapp/50 outline-none transition-all" />
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Last Agent</label>
+                <input required type="text" placeholder="Last Name" className="w-full bg-slate-950 border border-white/5 rounded-xl py-3.5 px-5 text-xs font-black uppercase tracking-widest focus:border-whatsapp/50 outline-none transition-all" />
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Confirmation Channel</label>
-              <input name="email" required type="email" placeholder="Email Address for tracking briefing" className="w-full bg-slate-900/60 border border-slate-700 rounded-xl py-3.5 px-4 text-sm font-medium focus:border-whatsapp/50 outline-none transition-all" />
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Communication Line</label>
+              <input name="email" required type="email" placeholder="Email Address for encrypted briefing" className="w-full bg-slate-950 border border-white/5 rounded-xl py-3.5 px-5 text-xs font-black uppercase tracking-widest focus:border-whatsapp/50 outline-none transition-all" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Target Address</label>
-              <textarea required rows={3} placeholder="Full physical address for drop-off..." className="w-full bg-slate-900/60 border border-slate-700 rounded-xl py-3.5 px-4 text-sm font-medium focus:border-whatsapp/50 outline-none resize-none transition-all" />
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Drop Zone Location</label>
+              <textarea required rows={3} placeholder="Full physical address for high-speed transit..." className="w-full bg-slate-950 border border-white/5 rounded-xl py-3.5 px-5 text-xs font-black uppercase tracking-widest focus:border-whatsapp/50 outline-none resize-none transition-all" />
             </div>
           </div>
 
           {/* Payment Method */}
-          <div className="bg-slate-800/40 border border-slate-700/50 p-8 rounded-[2.5rem] space-y-6 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-8 opacity-5"><CreditCard className="w-20 h-20" /></div>
-            <h2 className="text-xl font-black italic uppercase tracking-tighter flex items-center gap-3">
-              <CreditCard className="w-5 h-5 text-whatsapp" /> Transaction Protocol
+          <div className="bg-slate-900 border border-white/5 p-6 rounded-3xl space-y-6">
+            <h2 className="text-sm font-black uppercase tracking-widest text-slate-100 flex items-center gap-3">
+              <CreditCard className="w-5 h-5 text-whatsapp" /> Asset Transfer Protocol
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <button type="button" className="bg-whatsapp/10 border-2 border-whatsapp/50 p-6 rounded-3xl flex flex-col items-center gap-3 group/btn relative overflow-hidden">
-                <div className="absolute inset-0 bg-whatsapp/5 opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-                <div className="w-12 h-12 bg-whatsapp/20 rounded-2xl flex items-center justify-center text-whatsapp shadow-xl border border-whatsapp/30">
-                  <ShoppingBag className="w-6 h-6" />
+              <button type="button" className="bg-whatsapp/10 border border-whatsapp p-4 rounded-2xl flex flex-col items-center gap-2 relative overflow-hidden transition-all shadow-lg shadow-whatsapp/5">
+                <div className="w-10 h-10 bg-whatsapp/20 rounded-xl flex items-center justify-center text-whatsapp shadow-lg">
+                  <ShoppingBag className="w-5 h-5" />
                 </div>
                 <div className="text-center">
-                  <span className="block text-[10px] font-black uppercase tracking-widest text-whatsapp">Cash On Delivery</span>
-                  <span className="block text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-1">Direct Exchange</span>
+                  <span className="block text-[9px] font-black uppercase tracking-widest text-whatsapp leading-none">C.O.D.</span>
+                  <span className="block text-[7px] font-bold text-slate-500 uppercase tracking-widest mt-1">Direct Handover</span>
                 </div>
               </button>
               
-              <button type="button" className="bg-slate-900/40 border-2 border-slate-700/50 p-6 rounded-3xl flex flex-col items-center gap-3 grayscale opacity-40 cursor-not-allowed group/btn">
-                <div className="w-12 h-12 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-500 border border-white/5">
-                  <Zap className="w-6 h-6" />
+              <button type="button" className="bg-slate-950 border border-white/5 p-4 rounded-2xl flex flex-col items-center gap-2 grayscale opacity-30 cursor-not-allowed transition-all">
+                <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-slate-700">
+                  <Zap className="w-5 h-5" />
                 </div>
                 <div className="text-center">
-                  <span className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Crypto Sync</span>
-                  <span className="block text-[8px] font-bold text-slate-600 uppercase tracking-widest mt-1">Reason: Syncing...</span>
+                  <span className="block text-[9px] font-black uppercase tracking-widest text-slate-500 leading-none">Net Bank</span>
+                  <span className="block text-[7px] font-bold text-slate-600 uppercase tracking-widest mt-1">Pending Sync</span>
                 </div>
               </button>
 
-              <button type="button" className="bg-slate-900/40 border-2 border-slate-700/50 p-6 rounded-3xl flex flex-col items-center gap-3 grayscale opacity-40 cursor-not-allowed group/btn">
-                <div className="w-12 h-12 bg-slate-800 rounded-2xl flex items-center justify-center text-slate-500 border border-white/5">
-                  <CreditCard className="w-6 h-6" />
+              <button type="button" className="bg-slate-950 border border-white/5 p-4 rounded-2xl flex flex-col items-center gap-2 grayscale opacity-30 cursor-not-allowed transition-all">
+                <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-slate-700">
+                  <CreditCard className="w-5 h-5" />
                 </div>
                 <div className="text-center">
-                  <span className="block text-[10px] font-black uppercase tracking-widest text-slate-500">System Credit</span>
-                  <span className="block text-[8px] font-bold text-slate-600 uppercase tracking-widest mt-1">Reason: Offline</span>
+                  <span className="block text-[9px] font-black uppercase tracking-widest text-slate-500 leading-none">Card Base</span>
+                  <span className="block text-[7px] font-bold text-slate-600 uppercase tracking-widest mt-1">Unauthorized</span>
                 </div>
               </button>
             </div>
@@ -117,53 +114,57 @@ export default function Checkout() {
         </div>
 
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-slate-900/60 border border-white/5 p-8 rounded-[2.5rem] space-y-8 sticky top-24 shadow-2xl backdrop-blur-xl">
+          <div className="bg-slate-900 border border-white/5 p-6 rounded-3xl space-y-6 sticky top-24 shadow-2xl">
             <div className="flex items-center justify-between">
-              <h2 className="font-black italic uppercase tracking-tighter text-lg leading-none">System <span className="text-whatsapp">Output</span></h2>
-              <div className="px-3 py-1 bg-whatsapp/10 rounded-lg text-[10px] font-black uppercase tracking-widest text-whatsapp animate-pulse">Live Tracking</div>
+              <h2 className="text-sm font-black italic uppercase tracking-widest text-slate-100 leading-none">Package <span className="text-whatsapp">Manifest</span></h2>
+              <div className="px-2.5 py-1 bg-whatsapp/10 rounded-full text-[8px] font-black uppercase tracking-widest text-whatsapp border border-whatsapp/20">LIVE</div>
             </div>
-            <div className="space-y-6">
-              <div className="flex items-center gap-4 bg-slate-800/30 p-3 rounded-2xl border border-white/5 group hover:border-whatsapp/20 transition-all">
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 bg-slate-950 p-3 rounded-2xl border border-white/5 group hover:border-whatsapp/20 transition-all">
                 <div className="w-16 h-16 bg-slate-900 rounded-xl relative overflow-hidden flex items-center justify-center">
-                  <img src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf" className="w-full h-full object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all" />
+                  <img src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf" className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-[10px] font-black uppercase tracking-tight text-slate-100 truncate">Aero-X Headset</h4>
-                  <span className="block text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Unit #01 / Alpha</span>
+                  <h4 className="text-[10px] font-black uppercase tracking-tight text-slate-200 truncate leading-none">Hardware Protocol</h4>
+                  <span className="block text-[7px] font-bold text-slate-600 uppercase tracking-widest mt-1">Batch #472</span>
                 </div>
                 <div className="text-right">
-                  <span className="block text-[10px] font-black text-whatsapp italic tracking-tighter">{formatCurrency(189.99)}</span>
-                  <span className="block text-[9px] font-bold text-slate-600 uppercase tracking-widest">QTY: 01</span>
+                  <span className="block text-[11px] font-black text-whatsapp italic leading-none">{formatCurrency(189.99)}</span>
+                  <span className="block text-[8px] font-bold text-slate-600 uppercase tracking-widest mt-1">x1</span>
                 </div>
               </div>
               
-              <div className="pt-8 border-t border-white/10 space-y-4">
-                <div className="flex justify-between text-[10px] text-slate-500 font-black uppercase tracking-widest">
-                  <span>Subtotal Payload</span>
+              <div className="pt-6 border-t border-white/10 space-y-4">
+                <div className="flex justify-between text-[10px] text-slate-500 font-black uppercase tracking-widest leading-none">
+                  <span>Subtotal Value</span>
                   <span className="text-slate-300">{formatCurrency(189.99)}</span>
                 </div>
-                <div className="flex justify-between items-center pt-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-200">Terminal Total</span>
-                  <span className="text-4xl font-black text-whatsapp italic tracking-tighter leading-none">{formatCurrency(189.99)}</span>
+                <div className="flex justify-between items-end">
+                  <div className="space-y-1">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 leading-none">Total Commitment</span>
+                    <div className="text-3xl font-black text-white italic leading-none">{formatCurrency(189.99)}</div>
+                  </div>
+                  <ShieldCheck className="w-5 h-5 text-whatsapp/20 mb-1" />
                 </div>
               </div>
               
               <div className="space-y-3 pt-4">
                 <button
                   disabled={loading}
-                  className="w-full bg-whatsapp text-slate-900 py-6 rounded-[2rem] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-[0_15px_40px_rgba(34,197,94,0.4)] hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-20 disabled:grayscale"
+                  className="w-full bg-whatsapp text-slate-950 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-whatsapp/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-20 transition-all"
                 >
                   {loading ? (
-                    <div className="w-6 h-6 border-2 border-slate-900/20 border-t-slate-900 rounded-full animate-spin" />
+                    <div className="w-6 h-6 border-4 border-slate-950/20 border-t-slate-950 rounded-full animate-spin" />
                   ) : (
                     <>
-                      Confirm Deployment <ChevronRight className="w-4 h-4" />
+                      Confirm Procurement <ChevronRight className="w-4 h-4" />
                     </>
                   )}
                 </button>
-                <div className="flex items-center gap-2 justify-center py-2">
-                  <ShieldCheck className="w-3.5 h-3.5 text-whatsapp" /> 
-                  <span className="text-[9px] text-slate-600 font-black uppercase tracking-[0.2em]">Secured Retail Protocol v4.0.2</span>
+                <div className="flex items-center gap-2 justify-center py-2 border-t border-white/5 mt-2">
+                  <ShieldCheck className="w-3 h-3 text-whatsapp" /> 
+                  <span className="text-[8px] text-slate-600 font-bold uppercase tracking-widest">Secured Retail Intelligence</span>
                 </div>
               </div>
             </div>

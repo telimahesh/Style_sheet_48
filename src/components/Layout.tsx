@@ -13,16 +13,16 @@ const NavItem = ({ to, icon, label, active }: { to: string, icon: React.ReactNod
     to={to} 
     className={cn(
       "flex flex-col items-center gap-1 transition-all duration-300",
-      active ? "text-whatsapp scale-110" : "text-slate-500 hover:text-slate-300"
+      active ? "text-whatsapp scale-105" : "text-slate-500 hover:text-slate-300"
     )}
   >
     <div className={cn(
-      "p-1 rounded-lg transition-transform",
-      active && "bg-whatsapp/10"
+      "p-1.5 rounded-xl transition-all duration-500",
+      active && "bg-whatsapp/10 shadow-[0_0_20px_rgba(34,197,94,0.1)]"
     )}>
       {icon}
     </div>
-    <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
+    <span className="text-[10px] font-medium uppercase tracking-[0.15em]">{label}</span>
   </Link>
 );
 
@@ -62,7 +62,7 @@ export default function Layout() {
   };
 
   return (
-    <div className="min-h-screen pb-20 bg-background text-slate-100">
+    <div className="min-h-screen pb-24 bg-background text-slate-100 font-sans">
       {/* Back to Top */}
       <AnimatePresence>
         {showBackToTop && (
@@ -71,70 +71,69 @@ export default function Layout() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5 }}
             onClick={scrollToTop}
-            className="fixed bottom-24 right-6 z-50 p-3 bg-whatsapp text-slate-900 rounded-2xl shadow-[0_10px_30px_rgba(34,197,94,0.4)] hover:scale-110 active:scale-95 transition-all outline-none"
+            className="fixed bottom-28 right-6 z-50 p-4 bg-whatsapp text-slate-950 rounded-2xl shadow-2xl shadow-whatsapp/20 hover:scale-110 active:scale-95 transition-all outline-none"
           >
-            <ChevronUp className="w-5 h-5" strokeWidth={3} />
+            <ChevronUp className="w-5 h-5" strokeWidth={2.5} />
           </motion.button>
         )}
       </AnimatePresence>
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-slate-900/60 backdrop-blur-md border-b border-white/5 px-4 py-4 flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-50 bg-slate-900/40 backdrop-blur-xl border-b border-white/10 px-6 py-5 flex items-center justify-between gap-6">
         {/* Scroll Progress Bar */}
         {showScrollProgress && (
           <motion.div
-            className="absolute bottom-0 left-0 right-0 h-[2px] bg-whatsapp origin-left z-[60]"
+            className="absolute bottom-0 left-0 right-0 h-[3px] bg-whatsapp origin-left z-[60]"
             style={{ scaleX }}
           />
         )}
         <Link to="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-whatsapp rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(34,197,94,0.4)]">
-            <span className="text-slate-900 font-black text-lg">LS</span>
+          <div className="w-11 h-11 bg-whatsapp rounded-xl flex items-center justify-center shadow-2xl shadow-whatsapp/20 rotate-3 hover:rotate-0 transition-transform">
+            <span className="text-slate-950 font-bold text-xl tracking-tight">LS</span>
           </div>
-          <span className="font-black text-xl tracking-tight italic uppercase hidden sm:block">
+          <span className="font-bold text-2xl tracking-tight hidden sm:block">
             locking<span className="text-whatsapp">style</span>
           </span>
         </Link>
 
         {/* Search Bar */}
-        <form onSubmit={handleSearch} className="flex-1 max-w-md relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <form onSubmit={handleSearch} className="flex-1 max-w-md relative group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-500 group-focus-within:text-whatsapp transition-colors" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search products..."
-            className="w-full bg-slate-800/50 border border-slate-700 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-whatsapp/50 transition-colors"
+            placeholder="Search our collection..."
+            className="w-full bg-slate-800/30 border border-slate-700/50 rounded-2xl py-2.5 pl-12 pr-6 focus:outline-none focus:border-whatsapp/50 focus:bg-slate-800/60 transition-all text-sm font-medium"
           />
         </form>
 
-        {/* Branch Selector & Notification Toggle */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {permission !== 'granted' && (
             <button 
               onClick={requestPermission}
-              className="p-2 rounded-full bg-slate-800/50 border border-slate-700 text-slate-400 hover:text-whatsapp hover:border-whatsapp/30 transition-colors hidden md:flex"
-              title="Enable Intelligence Alerts"
+              className="p-2.5 rounded-2xl bg-slate-800/30 border border-slate-700/50 text-slate-400 hover:text-whatsapp hover:border-whatsapp/30 transition-all hidden lg:flex"
+              title="Enable Notifications"
             >
-              <Bell className="w-4 h-4" />
+              <Bell className="w-4.5 h-4.5" />
             </button>
           )}
-          <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700 text-sm hover:border-whatsapp/30 transition-colors">
+          <button className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-slate-800/30 border border-slate-700/50 text-sm font-semibold hover:border-whatsapp/30 transition-all">
             <MapPin className="w-4 h-4 text-whatsapp" />
-            <span className="hidden md:inline">Main Branch</span>
+            <span className="hidden md:inline">London Central</span>
           </button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-6 py-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
           >
             <Outlet />
           </motion.div>
@@ -142,30 +141,30 @@ export default function Layout() {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/90 border-t border-white/5 px-2 h-16 flex justify-around items-center max-w-md mx-auto sm:rounded-t-2xl">
-        <NavItem to="/" icon={<Home className="w-5 h-5" />} label="Home" active={location.pathname === '/'} />
-        <NavItem to="/categories" icon={<Grid className="w-5 h-5" />} label="Shop" active={location.pathname === '/categories'} />
+      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/60 backdrop-blur-2xl border border-white/10 px-4 h-20 flex justify-around items-center w-[92%] max-w-md rounded-[2.5rem] shadow-2xl shadow-black/50">
+        <NavItem to="/" icon={<Home className="w-6 h-6" />} label="Home" active={location.pathname === '/'} />
+        <NavItem to="/categories" icon={<Grid className="w-6 h-6" />} label="Shop" active={location.pathname === '/categories'} />
         
-        <Link to="/cart" className="relative -mt-8 flex flex-col items-center group">
+        <Link to="/cart" className="relative -mt-12 flex flex-col items-center group">
           <div className={cn(
-            "w-12 h-12 rounded-full flex items-center justify-center border-4 border-background shadow-lg transition-all duration-300 relative",
-            location.pathname === '/cart' ? "bg-whatsapp text-slate-900 scale-110 shadow-whatsapp/40" : "bg-slate-800 text-slate-400 group-hover:bg-slate-700"
+            "w-16 h-16 rounded-[2rem] flex items-center justify-center border-4 border-background shadow-2xl transition-all duration-500 relative",
+            location.pathname === '/cart' ? "bg-whatsapp text-slate-950 scale-110 shadow-whatsapp/30 rotate-12" : "bg-slate-800 text-slate-400 group-hover:bg-slate-700 group-hover:-translate-y-1"
           )}>
-            <ShoppingCart className="w-5 h-5" />
+            <ShoppingCart className="w-6 h-6" />
             {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-background">
+              <span className="absolute -top-1 -right-1 bg-white text-slate-950 text-[9px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-background">
                 {totalItems}
               </span>
             )}
           </div>
           <span className={cn(
-            "text-[10px] font-bold mt-1 uppercase transition-all duration-300",
+            "text-[10px] font-bold mt-2 uppercase tracking-widest transition-all duration-300",
             location.pathname === '/cart' ? "text-whatsapp" : "opacity-0"
           )}>Cart</span>
         </Link>
 
-        <NavItem to="/track-order" icon={<Search className="w-5 h-5" />} label="Track" active={location.pathname === '/track-order'} />
-        <NavItem to="/profile" icon={<User className="w-5 h-5" />} label="Profile" active={location.pathname === '/profile'} />
+        <NavItem to="/track-order" icon={<Search className="w-6 h-6" />} label="Track" active={location.pathname === '/track-order'} />
+        <NavItem to="/profile" icon={<User className="w-6 h-6" />} label="Profile" active={location.pathname === '/profile'} />
       </nav>
     </div>
   );

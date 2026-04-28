@@ -64,161 +64,127 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-[90vh] flex flex-col items-center justify-center space-y-8 p-4">
+    <div className="min-h-[85vh] flex flex-col items-center justify-center space-y-8 p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-slate-900/60 border border-white/5 p-8 rounded-[2rem] space-y-8 relative backdrop-blur-xl shadow-2xl"
+        className="w-full max-w-lg bg-slate-900 border border-white/5 p-8 rounded-3xl space-y-8 shadow-2xl"
       >
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-black italic uppercase tracking-tighter">Create <span className="text-whatsapp">Protocol</span></h1>
-          <p className="text-slate-400 text-sm font-medium">Join the elite retail ecosystem</p>
+          <div className="w-16 h-16 bg-whatsapp/10 rounded-2xl mx-auto flex items-center justify-center mb-4">
+            <UserPlus className="w-8 h-8 text-whatsapp" />
+          </div>
+          <h1 className="text-2xl font-black italic uppercase tracking-tighter">Staff <span className="text-whatsapp">Registry</span></h1>
+          <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Digital Infrastructure Onboarding</p>
         </div>
 
         {error && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-500"
-          >
-            <AlertCircle className="w-5 h-5 shrink-0" />
-            <p className="text-[10px] font-black uppercase tracking-widest leading-relaxed">
-              {error}
-            </p>
-          </motion.div>
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-500 text-xs font-bold uppercase tracking-tight italic">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <p>{error}</p>
+          </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
-                <div className="relative">
-                  <User className={cn(
-                    "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors",
-                    errors.fullName ? "text-red-500" : "text-slate-500"
-                  )} />
-                  <input 
-                    type="text" 
-                    placeholder="John D." 
-                    {...register('fullName')}
-                    className={cn(
-                      "w-full bg-slate-950 border rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none transition-all",
-                      errors.fullName 
-                        ? "border-red-500/50 focus:border-red-500 bg-red-500/5" 
-                        : "border-slate-700 focus:border-whatsapp/50"
-                    )}
-                  />
-                </div>
-                {errors.fullName && (
-                  <p className="text-[9px] font-bold text-red-500 uppercase tracking-wider ml-1 mt-1 leading-none">
-                    {errors.fullName.message}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">WhatsApp No</label>
-                <div className="relative">
-                  <MessageCircle className={cn(
-                    "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors",
-                    errors.whatsappNo ? "text-red-500" : "text-slate-500"
-                  )} />
-                  <input 
-                    type="tel" 
-                    placeholder="+123..." 
-                    {...register('whatsappNo')}
-                    className={cn(
-                      "w-full bg-slate-950 border rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none transition-all",
-                      errors.whatsappNo 
-                        ? "border-red-500/50 focus:border-red-500 bg-red-500/5" 
-                        : "border-slate-700 focus:border-whatsapp/50"
-                    )}
-                  />
-                </div>
-                {errors.whatsappNo && (
-                  <p className="text-[9px] font-bold text-red-500 uppercase tracking-wider ml-1 mt-1 leading-none">
-                    {errors.whatsappNo.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
-              <div className="relative">
-                <Mail className={cn(
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Identity</label>
+              <div className="relative group">
+                <User className={cn(
                   "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors",
-                  errors.email ? "text-red-500" : "text-slate-500"
+                  errors.fullName ? "text-red-500" : "text-slate-600 group-focus-within:text-whatsapp"
                 )} />
                 <input 
-                  type="email" 
-                  placeholder="name@example.com" 
-                  {...register('email')}
+                  type="text" 
+                  placeholder="AGENT NAME" 
+                  {...register('fullName')}
                   className={cn(
-                    "w-full bg-slate-950 border rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none transition-all",
-                    errors.email 
-                      ? "border-red-500/50 focus:border-red-500 bg-red-500/5" 
-                      : "border-slate-700 focus:border-whatsapp/50"
+                    "w-full bg-slate-950 border rounded-xl py-3 pl-11 pr-4 text-xs font-black uppercase tracking-widest focus:outline-none transition-all",
+                    errors.fullName ? "border-red-500/50" : "border-white/5 focus:border-whatsapp/50"
                   )}
                 />
               </div>
-              {errors.email && (
-                <p className="text-[9px] font-bold text-red-500 uppercase tracking-wider ml-1 mt-1 leading-none">
-                  {errors.email.message}
-                </p>
-              )}
             </div>
-
+            
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Account Secret</label>
-              <div className="relative">
-                <Lock className={cn(
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">WhatsApp No</label>
+              <div className="relative group">
+                <MessageCircle className={cn(
                   "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors",
-                  errors.password ? "text-red-500" : "text-slate-500"
+                  errors.whatsappNo ? "text-red-500" : "text-slate-600 group-focus-within:text-whatsapp"
                 )} />
                 <input 
-                  type="password" 
-                  placeholder="••••••••" 
-                  {...register('password')}
+                  type="tel" 
+                  placeholder="+91..." 
+                  {...register('whatsappNo')}
                   className={cn(
-                    "w-full bg-slate-950 border rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none transition-all",
-                    errors.password 
-                      ? "border-red-500/50 focus:border-red-500 bg-red-500/5" 
-                      : "border-slate-700 focus:border-whatsapp/50"
+                    "w-full bg-slate-950 border rounded-xl py-3 pl-11 pr-4 text-xs font-black uppercase tracking-widest focus:outline-none transition-all",
+                    errors.whatsappNo ? "border-red-500/50" : "border-white/5 focus:border-whatsapp/50"
                   )}
                 />
               </div>
-              {errors.password && (
-                <p className="text-[9px] font-bold text-red-500 uppercase tracking-wider ml-1 mt-1 leading-none">
-                  {errors.password.message}
-                </p>
-              )}
             </div>
           </div>
 
-          <div className="p-4 bg-slate-800/30 rounded-2xl border border-white/5">
-            <p className="text-[10px] text-slate-500 text-center leading-relaxed">
-              By joining, you agree to our <span className="text-slate-300 font-bold uppercase cursor-pointer">System Terms</span> and <span className="text-slate-300 font-bold uppercase cursor-pointer">Privacy Protocols</span>.
-            </p>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Network Email</label>
+            <div className="relative group">
+              <Mail className={cn(
+                "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors",
+                errors.email ? "text-red-500" : "text-slate-600 group-focus-within:text-whatsapp"
+              )} />
+              <input 
+                type="email" 
+                placeholder="AGENT@LOCKINGSTYLE.COM" 
+                {...register('email')}
+                className={cn(
+                  "w-full bg-slate-950 border rounded-xl py-3.5 pl-11 pr-4 text-xs font-black uppercase tracking-widest focus:outline-none transition-all",
+                  errors.email ? "border-red-500/50" : "border-white/5 focus:border-whatsapp/50"
+                )}
+              />
+            </div>
           </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Access Phrase</label>
+            <div className="relative group">
+              <Lock className={cn(
+                "absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors",
+                errors.password ? "text-red-500" : "text-slate-600 group-focus-within:text-whatsapp"
+              )} />
+              <input 
+                type="password" 
+                placeholder="••••••••" 
+                {...register('password')}
+                className={cn(
+                  "w-full bg-slate-950 border rounded-xl py-3.5 pl-11 pr-4 text-xs font-black tracking-widest focus:outline-none transition-all",
+                  errors.password ? "border-red-500/50" : "border-white/5 focus:border-whatsapp/50"
+                )}
+              />
+            </div>
+          </div>
+
+          <p className="text-[9px] text-slate-500 text-center leading-relaxed">
+            By registering, you agree to our <span className="text-whatsapp cursor-pointer">Protocol Terms</span> and <span className="text-whatsapp cursor-pointer">Security Charter</span>.
+          </p>
 
           <button
             disabled={loading}
-            className="w-full bg-whatsapp text-slate-900 font-black uppercase text-xs py-5 rounded-2xl flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_15px_40px_rgba(34,197,94,0.3)] disabled:opacity-50"
+            className="w-full bg-whatsapp text-slate-950 font-black uppercase text-[10px] py-4 rounded-xl flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-whatsapp/20 disabled:opacity-50"
           >
             {loading ? (
-              <div className="w-5 h-5 border-2 border-slate-900/40 border-t-slate-900 rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-slate-950/20 border-t-slate-950 rounded-full animate-spin" />
             ) : (
               <>
-                <UserPlus className="w-4 h-4" /> <span>Deploy Account Protocol</span>
+                <UserPlus className="w-4 h-4" /> Initialize Agent Profile
               </>
             )}
           </button>
         </form>
 
-        <div className="text-center">
+        <div className="text-center pt-2">
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-            Already verified? <Link to="/login" className="text-whatsapp font-black">Log back in</Link>
+            Existing Dispatcher? <Link to="/login" className="text-whatsapp border-b border-whatsapp/30 ml-1">Secure Login</Link>
           </p>
         </div>
       </motion.div>

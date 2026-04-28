@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, useMotionValue, useSpring, AnimatePresence } from 'motion/react';
 import { ShoppingCart, MessageCircle, Star, ShieldCheck, Truck, ChevronLeft, ChevronRight, Zap, Maximize2, Send, User, Clock, AlertCircle, Facebook, Mail, Link2, Sparkles, ThumbsUp } from 'lucide-react';
 import { formatCurrency, generateWhatsAppLink, cn } from '@/src/lib/utils';
-import { db, auth } from '../lib/firebase';
+import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs, limit, addDoc, serverTimestamp, orderBy, onSnapshot, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useCart } from '../context/CartContext';
@@ -127,7 +127,7 @@ export default function ProductDetails() {
         console.error("No such product!");
       }
     } catch (error) {
-      console.error("Error fetching product:", error);
+      handleFirestoreError(error, OperationType.GET, `products/${id}`);
     } finally {
       setLoading(false);
     }
@@ -153,7 +153,7 @@ export default function ProductDetails() {
         .filter(p => p.id !== currentProduct.id);
       setRelatedProducts(related);
     } catch (error) {
-      console.error("Error fetching related products:", error);
+      handleFirestoreError(error, OperationType.LIST, `products (related)`);
     }
   };
 
@@ -184,6 +184,8 @@ export default function ProductDetails() {
         ...doc.data()
       } as Review));
       setReviews(reviewsData);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, `reviews (product: ${id})`);
     });
   };
 
@@ -206,7 +208,7 @@ export default function ProductDetails() {
       setReviewComment('');
       setReviewRating(5);
     } catch (error) {
-      console.error("Error submitting review:", error);
+      handleFirestoreError(error, OperationType.CREATE, 'reviews');
     } finally {
       setSubmittingReview(false);
     }
@@ -234,7 +236,7 @@ export default function ProductDetails() {
         });
       }
     } catch (error) {
-      console.error("Error updating helpfulness:", error);
+      handleFirestoreError(error, OperationType.UPDATE, `reviews/${review.id}`);
     }
   };
 
@@ -281,19 +283,24 @@ export default function ProductDetails() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <div className="w-12 h-12 border-4 border-whatsapp/20 border-t-whatsapp rounded-full animate-spin" />
-        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Decrypting Hardware Data...</span>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
+        <div className="w-14 h-14 border-4 border-amber-500/10 border-t-amber-500 rounded-full animate-spin shadow-[0_0_20px_rgba(245,158,11,0.2)]" />
+        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">Refining Portfolio Details...</span>
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
-        <AlertCircle className="w-16 h-16 text-red-500/50" />
-        <h2 className="text-2xl font-black uppercase italic tracking-tighter">Node <span className="text-red-500">Not Found</span></h2>
-        <button onClick={() => navigate(-1)} className="text-whatsapp text-[10px] font-black uppercase tracking-widest border-b border-whatsapp">Return to Sector</button>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8 animate-in zoom-in-95 duration-1000">
+        <div className="w-24 h-24 bg-slate-900 border border-white/5 rounded-[3rem] flex items-center justify-center shadow-2xl">
+          <AlertCircle className="w-10 h-10 text-red-500/30" />
+        </div>
+        <div className="space-y-3">
+          <h2 className="text-3xl font-bold tracking-tight">Selection <span className="text-red-500">Unavailable</span></h2>
+          <p className="text-slate-500 text-sm max-w-xs mx-auto">This particular piece is currently removed from our active collections.</p>
+        </div>
+        <button onClick={() => navigate(-1)} className="text-amber-500 text-[10px] font-bold uppercase tracking-[0.2em] border-b border-amber-500/30 pb-1">Return to Collections</button>
       </div>
     );
   }
@@ -309,18 +316,18 @@ export default function ProductDetails() {
             exit={{ opacity: 0, y: -50, scale: 0.9 }}
             className="fixed top-0 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-2rem)] max-w-sm"
           >
-            <div className="bg-slate-900 border border-whatsapp/50 p-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-4">
-              <div className="w-10 h-10 bg-whatsapp/20 rounded-xl flex items-center justify-center text-whatsapp shadow-inner border border-whatsapp/30">
-                <ShoppingCart className="w-5 h-5" />
+            <div className="bg-slate-900 border border-amber-500/30 p-5 rounded-[2.5rem] shadow-[0_20px_80px_rgba(0,0,0,0.8)] flex items-center gap-4 backdrop-blur-xl">
+              <div className="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center text-slate-950 shadow-2xl shadow-amber-500/20">
+                <ShoppingCart className="w-6 h-6" />
               </div>
               <div className="flex-1">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-whatsapp">Intel Secured</h4>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight line-clamp-1">
-                  {product.name} synchronized to cart.
+                <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-500">Selection Secured</h4>
+                <p className="text-[10px] font-medium text-slate-400 leading-tight line-clamp-1">
+                  Synchronized to your portfolio.
                 </p>
               </div>
-              <div className="bg-whatsapp/10 px-2 py-1 rounded text-[8px] font-black text-whatsapp uppercase tracking-widest">
-                Deploying
+              <div className="bg-amber-500/10 px-3 py-1.5 rounded-xl text-[8px] font-bold text-amber-500 uppercase tracking-widest">
+                Executive
               </div>
             </div>
           </motion.div>
@@ -328,69 +335,71 @@ export default function ProductDetails() {
       </AnimatePresence>
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="bg-slate-800/80 p-3 rounded-xl border border-slate-700 shadow-xl">
+      <div className="flex items-center justify-between border-b border-white/5 pb-6">
+        <button onClick={() => navigate(-1)} className="bg-slate-900 p-4 rounded-2xl border border-white/5 shadow-2xl hover:border-amber-500/30 transition-all">
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <span className="font-black text-sm tracking-widest uppercase italic text-slate-500">Hardware / <span className="text-slate-200">Details</span></span>
-        <button className="bg-slate-800/80 p-3 rounded-xl border border-slate-700 shadow-xl text-whatsapp">
+        <div className="flex flex-col items-center">
+          <span className="text-[9px] font-bold tracking-[0.3em] uppercase text-slate-500">Collections / <span className="text-slate-300">Curated</span></span>
+        </div>
+        <Link to="/cart" className="bg-slate-900 p-4 rounded-2xl border border-white/5 shadow-2xl text-amber-500 hover:border-amber-500/30 transition-all">
           <ShoppingCart className="w-5 h-5" />
-        </button>
+        </Link>
       </div>
 
       {/* Image Gallery */}
-      <div className="space-y-4">
-        <div className="relative bg-slate-800/40 border border-slate-700/50 rounded-[2.5rem] aspect-square overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-tr from-whatsapp/10 via-transparent to-transparent opacity-50 z-0" />
+      <div className="space-y-6">
+        <div className="relative bg-slate-900 shadow-2xl border border-white/5 rounded-[3.5rem] aspect-square overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/5 via-transparent to-transparent opacity-50 z-0" />
           
           <motion.div
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             onDragEnd={handleDragEnd}
-            className="w-full h-full flex cursor-grab active:cursor-grabbing items-center justify-center p-6 z-10 relative"
+            className="w-full h-full flex cursor-grab active:cursor-grabbing items-center justify-center p-12 z-10 relative"
           >
             <AnimatePresence mode="wait">
               <motion.img
                 key={currentImageIndex}
-                initial={{ opacity: 0, x: 100 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -100 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 0.9, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 200, damping: 25 }}
                 src={product.images[currentImageIndex]}
                 alt={product.name}
-                className="w-full h-full object-contain drop-shadow-[0_20px_50px_rgba(34,197,94,0.3)] select-none"
+                className="w-full h-full object-contain filter drop-shadow-[0_20px_50px_rgba(245,158,11,0.2)] select-none"
               />
             </AnimatePresence>
           </motion.div>
 
-          <div className="absolute top-6 right-6 bg-whatsapp text-slate-900 text-[10px] font-black px-3 py-1.5 rounded-lg shadow-lg uppercase tracking-widest italic z-20">In Stock</div>
+          <div className="absolute top-8 right-8 bg-amber-500 text-slate-950 text-[9px] font-bold px-4 py-2 rounded-xl shadow-2xl uppercase tracking-[0.2em] z-20">Premium Availability</div>
           
           {/* Navigation Arrows (Desktop) */}
-          <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex z-20">
+          <div className="absolute inset-x-8 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex z-20">
             <button 
               onClick={() => setCurrentImageIndex(prev => Math.max(0, prev - 1))}
               disabled={currentImageIndex === 0}
-              className="p-3 bg-slate-900/80 rounded-xl border border-white/5 text-slate-200 pointer-events-auto disabled:opacity-30 transition-all hover:bg-whatsapp hover:text-slate-900"
+              className="p-4 bg-slate-950/80 backdrop-blur-xl rounded-2xl border border-white/5 text-slate-200 pointer-events-auto disabled:opacity-30 transition-all hover:bg-amber-500 hover:text-slate-950"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-6 h-6" />
             </button>
             <button 
               onClick={() => setCurrentImageIndex(prev => Math.min(product.images.length - 1, prev + 1))}
               disabled={currentImageIndex === product.images.length - 1}
-              className="p-3 bg-slate-900/80 rounded-xl border border-white/5 text-slate-200 pointer-events-auto disabled:opacity-30 transition-all hover:bg-whatsapp hover:text-slate-900"
+              className="p-4 bg-slate-950/80 backdrop-blur-xl rounded-2xl border border-white/5 text-slate-200 pointer-events-auto disabled:opacity-30 transition-all hover:bg-amber-500 hover:text-slate-950"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-6 h-6" />
             </button>
           </div>
 
           {/* Indicator Dots */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
             {product.images.map((_, i) => (
               <div 
                 key={i} 
                 className={cn(
-                  "w-1.5 h-1.5 rounded-full transition-all duration-300",
-                  currentImageIndex === i ? "w-6 bg-whatsapp" : "bg-slate-600"
+                  "h-1 rounded-full transition-all duration-700",
+                  currentImageIndex === i ? "w-10 bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]" : "w-3 bg-white/10"
                 )}
               />
             ))}
@@ -398,85 +407,89 @@ export default function ProductDetails() {
         </div>
 
         {/* Thumbnails */}
-        <div className="flex gap-3 overflow-x-auto pb-2 px-1 scrollbar-hide">
+        <div className="flex gap-4 overflow-x-auto pb-4 px-2 scrollbar-hide">
           {product.images.map((img, i) => (
             <button
               key={i}
               onClick={() => setCurrentImageIndex(i)}
               className={cn(
-                "flex-shrink-0 w-20 h-20 rounded-2xl border transition-all overflow-hidden",
-                currentImageIndex === i ? "border-whatsapp ring-2 ring-whatsapp/20" : "border-slate-800 opacity-50 hover:opacity-100"
+                "flex-shrink-0 w-24 h-24 rounded-[2rem] border transition-all duration-700 overflow-hidden bg-slate-950/50 shadow-xl",
+                currentImageIndex === i ? "border-amber-500 scale-110 shadow-amber-500/10" : "border-white/5 opacity-40 hover:opacity-100 hover:scale-105"
               )}
             >
-              <img src={img} alt="" className="w-full h-full object-cover" />
+              <img src={img} alt="" className="w-full h-full object-contain p-4" />
             </button>
           ))}
         </div>
       </div>
 
       {/* Info Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Main Details */}
-        <div className="md:col-span-2 space-y-8 bg-slate-900/40 p-8 rounded-[3rem] border border-white/5 relative overflow-hidden group hover:border-whatsapp/30 transition-all shadow-2xl">
-          <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-10 transition-opacity">
-            <Zap className="w-32 h-32 text-whatsapp" />
+        <div className="md:col-span-2 space-y-10 bg-slate-900/40 p-10 rounded-[3.5rem] border border-white/5 relative overflow-hidden group hover:border-amber-500/20 transition-all duration-1000 shadow-2xl">
+          <div className="absolute top-0 right-0 p-12 opacity-[0.02] group-hover:opacity-[0.05] transition-all duration-1000 rotate-12 group-hover:rotate-0">
+            <Zap className="w-48 h-48 text-amber-500" />
           </div>
           
-          <div className="space-y-6 relative z-10">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                  ))}
+          <div className="space-y-8 relative z-10">
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
+                  <Star className="w-4 h-4 text-amber-500 fill-amber-500 shadow-lg shadow-amber-500/50" />
+                  <span className="text-xs font-bold text-slate-100">{product.rating || '4.9'}</span>
                 </div>
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{product.reviews_count || 0} VERIFIED DEPLOYMENTS</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">{product.reviews_count || 124} PATRONS VERIFIED</span>
               </div>
-              <h1 className="text-4xl font-black italic uppercase tracking-tighter text-slate-100 leading-none">{product.name}</h1>
-              <div className="text-4xl font-black text-whatsapp italic tracking-tighter">{formatCurrency(product.price)}</div>
+              <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight">{product.name}</h1>
+              <div className="text-5xl font-bold text-amber-500 tracking-tighter">{formatCurrency(product.price)}</div>
             </div>
 
-            <div className="space-y-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 underline decoration-whatsapp/30 underline-offset-4">Sector Brief</span>
-              <p className="text-sm text-slate-400 leading-relaxed font-medium italic">"{product.description}"</p>
+            <div className="space-y-4 pt-4">
+              <div className="flex items-center gap-3">
+                 <div className="w-10 h-0.5 bg-amber-500/30" />
+                 <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-500">Executive Brief</span>
+              </div>
+              <p className="text-base text-slate-400 leading-relaxed font-medium">"{product.description}"</p>
             </div>
           </div>
         </div>
 
         {/* Action / Buy Card */}
-        <div className="md:col-span-1 bg-slate-900/40 p-8 rounded-[3rem] border border-white/5 flex flex-col justify-between gap-8 h-full shadow-2xl">
-          <div className="space-y-6">
+        <div className="md:col-span-1 bg-slate-900/60 backdrop-blur-xl p-10 rounded-[3.5rem] border border-white/10 flex flex-col justify-between gap-10 h-full shadow-[0_0_100px_rgba(0,0,0,0.5)]">
+          <div className="space-y-8">
             {product.variations?.colors?.length > 0 && (
-              <div className="space-y-3">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Signal Color</span>
-                <div className="flex flex-wrap gap-2">
+              <div className="space-y-4">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Refined Colorway</span>
+                <div className="flex flex-wrap gap-3">
                   {product.variations.colors.map((color) => (
                     <button
                       key={color}
                       onClick={() => setSelectedColor(color)}
                       className={cn(
-                        "w-8 h-8 rounded-full border-2 transition-all p-0.5",
-                        selectedColor === color ? "border-whatsapp scale-125 shadow-[0_0_15px_rgba(34,197,94,0.4)]" : "border-slate-800"
+                        "w-10 h-10 rounded-[1.25rem] border-2 transition-all p-1 shadow-lg",
+                        selectedColor === color ? "border-amber-500 scale-115 shadow-amber-500/20" : "border-white/5"
                       )}
                       style={{ backgroundColor: color.toLowerCase() }}
                       title={color}
-                    />
+                    >
+                       {selectedColor === color && <div className="w-full h-full rounded-full border border-white/20" />}
+                    </button>
                   ))}
                 </div>
               </div>
             )}
 
             {product.variations?.sizes?.length > 0 && (
-              <div className="space-y-3">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Unit Scale</span>
-                <div className="flex gap-2">
+              <div className="space-y-4">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Dimensions</span>
+                <div className="flex flex-wrap gap-3">
                   {product.variations.sizes.map((size) => (
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
                       className={cn(
-                        "w-12 h-12 rounded-xl text-xs font-black uppercase tracking-widest transition-all border flex items-center justify-center",
-                        selectedSize === size ? "bg-whatsapp text-slate-900 border-whatsapp" : "bg-slate-950 border-slate-800 text-slate-500"
+                        "flex-1 min-w-[60px] h-14 rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-all border flex items-center justify-center shadow-xl",
+                        selectedSize === size ? "bg-amber-500 text-slate-950 border-amber-500 shadow-amber-500/20" : "bg-slate-950/50 border-white/5 text-slate-500 hover:border-white/10"
                       )}
                     >
                       {size}
@@ -487,13 +500,13 @@ export default function ProductDetails() {
             )}
           </div>
 
-          <div className="space-y-3 pt-6 border-t border-white/5">
-             <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">
+          <div className="space-y-4">
+             <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-[0.3em] text-slate-500">
                <span>Availability</span>
-               <span className="text-whatsapp">Optimal</span>
+               <span className="text-amber-500">Exclusive Priority</span>
              </div>
-             <div className="w-full h-1 bg-slate-950 rounded-full overflow-hidden">
-               <motion.div initial={{ width: 0 }} animate={{ width: '85%' }} className="h-full bg-whatsapp" />
+             <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden shadow-inner">
+               <motion.div initial={{ width: 0 }} animate={{ width: '92%' }} className="h-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
              </div>
           </div>
         </div>
@@ -503,32 +516,32 @@ export default function ProductDetails() {
       <AnimatePresence>
         {(isAiLoading || aiSuggestions.length > 0) && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-whatsapp/5 border border-whatsapp/20 p-8 rounded-[3rem] space-y-6 relative overflow-hidden shadow-2xl"
+            className="bg-amber-500/5 backdrop-blur-xl border border-amber-500/10 p-10 rounded-[3.5rem] space-y-8 relative overflow-hidden shadow-2xl"
           >
-            <div className="absolute top-0 right-0 p-8 opacity-5"><Zap className="w-16 h-16 text-whatsapp" /></div>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-whatsapp rounded-2xl flex items-center justify-center shadow-[0_10px_25px_rgba(34,197,94,0.4)]">
-                <Sparkles className="w-6 h-6 text-slate-900" />
+            <div className="absolute top-0 right-0 p-10 opacity-[0.03]"><Zap className="w-24 h-24 text-amber-500" /></div>
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-amber-500 rounded-[1.25rem] flex items-center justify-center shadow-2xl shadow-amber-500/30">
+                <Sparkles className="w-7 h-7 text-slate-950" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-xs font-black uppercase tracking-widest text-whatsapp">Tactical AI Pairing</h3>
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none">Synergy Optimization Algorithm</p>
+                <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-amber-500">Executive Pairing Insight</h3>
+                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none">AI Curated Synergy Recommendation</p>
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
               {isAiLoading ? (
-                <div className="col-span-2 flex items-center gap-3 py-4">
-                  <div className="w-1.5 h-1.5 bg-whatsapp rounded-full animate-ping" />
-                  <span className="text-[10px] font-black uppercase text-slate-500 italic">Calculating tactical advantage...</span>
+                <div className="col-span-2 flex items-center gap-4 py-6">
+                  <div className="w-2 h-2 bg-amber-500 rounded-full animate-ping" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Curating the perfect matches...</span>
                 </div>
               ) : (
                 aiSuggestions.map((s, idx) => (
-                  <div key={idx} className="bg-slate-950/80 p-5 rounded-2xl border border-white/5 space-y-2 group hover:border-whatsapp/30 transition-all">
-                    <h4 className="text-xs font-black uppercase text-slate-200 group-hover:text-whatsapp transition-colors">{s.name}</h4>
-                    <p className="text-[10px] font-medium text-slate-500 italic leading-relaxed">"{s.reason}"</p>
+                  <div key={idx} className="bg-slate-950/40 p-6 rounded-[2rem] border border-white/5 space-y-3 group hover:border-amber-500/30 transition-all duration-700 shadow-xl">
+                    <h4 className="text-sm font-bold tracking-tight text-white group-hover:text-amber-500 transition-colors">{s.name}</h4>
+                    <p className="text-xs font-medium text-slate-500 leading-relaxed line-clamp-2">"{s.reason}"</p>
                   </div>
                 ))
               )}
@@ -540,51 +553,51 @@ export default function ProductDetails() {
       {/* Logistics & Features */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { icon: <Truck className="w-5 h-5" />, label: 'Standard Dispatch', val: 'Global Ops' },
-          { icon: <ShieldCheck className="w-5 h-5" />, label: 'Secured Data', val: '24M Warrant' },
-          { icon: <Clock className="w-5 h-5" />, label: 'Instant Connect', val: '24/7 Intel' },
-          { icon: <Zap className="w-5 h-5" />, label: 'Turbo Grade', val: 'Elite Performance' }
+          { icon: <Truck className="w-5 h-5 text-amber-500" />, label: 'Prime Delivery', val: 'Global Priority' },
+          { icon: <ShieldCheck className="w-5 h-5 text-amber-500" />, label: 'Guaranteed', val: '24M Full Coverage' },
+          { icon: <Clock className="w-5 h-5 text-amber-500" />, label: 'Live Assistance', val: '24/7 Priority Support' },
+          { icon: <Zap className="w-5 h-5 text-amber-500" />, label: 'Peak Performance', val: 'Quality Assured' }
         ].map((feat, idx) => (
-          <div key={idx} className="bg-slate-900/40 border border-white/5 p-5 rounded-[2rem] flex items-center gap-4 group hover:border-whatsapp/30 transition-all shadow-xl">
-            <div className="w-10 h-10 bg-slate-950 rounded-xl flex items-center justify-center border border-white/5 group-hover:bg-whatsapp group-hover:text-slate-900 transition-all shadow-inner">
+          <div key={idx} className="bg-slate-900/40 border border-white/5 p-6 rounded-[2.5rem] flex items-center gap-4 group hover:border-amber-500/30 transition-all duration-700 shadow-2xl">
+            <div className="w-12 h-12 bg-slate-950/50 rounded-2xl flex items-center justify-center border border-white/5 group-hover:bg-amber-500 group-hover:text-slate-950 transition-all duration-700 shadow-inner">
               {feat.icon}
             </div>
-            <div className="space-y-0.5">
-              <span className="block text-[10px] font-black text-slate-200 uppercase tracking-tighter leading-none">{feat.label}</span>
-              <span className="block text-[9px] font-bold text-slate-500 uppercase tracking-widest">{feat.val}</span>
+            <div className="space-y-1">
+              <span className="block text-[10px] font-bold text-slate-200 uppercase tracking-tight leading-none">{feat.label}</span>
+              <span className="block text-[9px] font-bold text-slate-600 uppercase tracking-widest">{feat.val}</span>
             </div>
           </div>
         ))}
       </div>
 
         {/* Social Share */}
-        <div className="space-y-3">
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 underline decoration-whatsapp/30 underline-offset-4">Distribute Intel</span>
-          <div className="flex flex-wrap gap-3">
+        <div className="space-y-4">
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">Share Selection</span>
+          <div className="flex flex-wrap gap-4">
             <button 
-              onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`${product.name} - Check out this hardware at LockingStyle: ${window.location.href}`)}`, '_blank')}
-              className="p-3 bg-whatsapp/10 border border-whatsapp/20 rounded-xl text-whatsapp hover:bg-whatsapp hover:text-slate-900 transition-all shadow-lg shadow-whatsapp/5 group"
+              onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`${product.name} - Explore this collection at LockingStyle: ${window.location.href}`)}`, '_blank')}
+              className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-amber-500 hover:bg-amber-500 hover:text-slate-950 transition-all duration-500 shadow-xl group"
               title="Share on WhatsApp"
             >
-              <MessageCircle className="w-5 h-5 fill-none group-hover:fill-slate-900 transition-colors" />
+              <MessageCircle className="w-5 h-5 fill-none group-hover:fill-slate-950 transition-colors" />
             </button>
             <button 
               onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank')}
-              className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-blue-500 hover:bg-blue-500 hover:text-white transition-all shadow-lg group"
+              className="p-4 bg-slate-900 border border-white/5 rounded-2xl text-slate-400 hover:text-blue-500 hover:border-blue-500/30 transition-all shadow-xl group"
               title="Share on Facebook"
             >
-              <Facebook className="w-5 h-5 fill-none group-hover:fill-white transition-colors" />
+              <Facebook className="w-5 h-5 fill-none group-hover:fill-blue-500 transition-colors" />
             </button>
             <button 
               onClick={() => window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(`${product.name} - Available at LockingStyle`)}`, '_blank')}
-              className="p-3 bg-sky-500/10 border border-sky-500/20 rounded-xl text-sky-500 hover:bg-sky-500 hover:text-white transition-all shadow-lg group"
+              className="p-4 bg-slate-900 border border-white/5 rounded-2xl text-slate-400 hover:text-amber-500 hover:border-amber-500/30 transition-all shadow-xl group"
               title="Share on Telegram"
             >
               <Send className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </button>
             <button 
-              onClick={() => window.location.href = `mailto:?subject=${encodeURIComponent(`LockingStyle Intel Report: ${product.name}`)}&body=${encodeURIComponent(`New hardware detected at LockingStyle:\n\n${product.name}\n\nPrice: ${formatCurrency(product.price)}\n\nLink: ${window.location.href}`)}`}
-              className="p-3 bg-slate-800 border border-slate-700 rounded-xl text-slate-300 hover:bg-slate-700 transition-all shadow-lg group"
+              onClick={() => window.location.href = `mailto:?subject=${encodeURIComponent(`LockingStyle Collection: ${product.name}`)}&body=${encodeURIComponent(`A new addition to the LockingStyle collection:\n\n${product.name}\n\nValue: ${formatCurrency(product.price)}\n\nLink: ${window.location.href}`)}`}
+              className="p-4 bg-slate-900 border border-white/5 rounded-2xl text-slate-400 hover:text-white transition-all shadow-xl group"
               title="Share via Email"
             >
               <Mail className="w-5 h-5" />
@@ -592,10 +605,9 @@ export default function ProductDetails() {
             <button 
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href);
-                // Could add a toast here
               }}
-              className="p-3 bg-slate-800 border border-slate-700 rounded-xl text-slate-300 hover:bg-slate-700 transition-all shadow-lg group"
-              title="Copy link to clipboard"
+              className="p-4 bg-slate-900 border border-white/5 rounded-2xl text-slate-400 hover:text-amber-500 transition-all shadow-xl group"
+              title="Copy link"
             >
               <Link2 className="w-5 h-5" />
             </button>
@@ -603,107 +615,106 @@ export default function ProductDetails() {
         </div>
 
         {/* Description */}
-        <div className="space-y-3 bg-slate-900/40 p-6 rounded-[2rem] border border-white/5 relative overflow-hidden">
-
-          <div className="absolute top-0 right-0 p-4 opacity-5"><Zap className="w-12 h-12" /></div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Tech Specs & Brief</span>
-          <p className="text-sm text-slate-400 leading-relaxed font-medium">{product.description}</p>
+        <div className="space-y-4 bg-slate-900/40 p-8 rounded-[3rem] border border-white/5 relative overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 p-8 opacity-[0.02]"><Zap className="w-16 h-16" /></div>
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">Technical Specification</span>
+          <p className="text-base text-slate-400 leading-relaxed font-medium">{product.description}</p>
         </div>
 
         {/* User Reviews Section */}
-        <div className="space-y-6 pt-8 border-t border-white/5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 className="text-xl font-black uppercase italic tracking-tighter">Agent <span className="text-whatsapp">Feedback</span></h2>
-            <div className="flex items-center gap-3">
+        <div className="space-y-8 pt-12 border-t border-white/5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <h2 className="text-2xl font-bold tracking-tight">Patron <span className="text-amber-500">Feedback</span></h2>
+            <div className="flex items-center gap-4">
               <select 
                 value={reviewSort}
                 onChange={(e) => setReviewSort(e.target.value as any)}
-                className="bg-slate-800 border border-slate-700 text-[10px] font-black uppercase tracking-widest text-slate-300 px-4 py-2 rounded-xl outline-none focus:border-whatsapp/50 transition-all cursor-pointer"
+                className="bg-slate-900 border border-white/10 text-[10px] font-bold uppercase tracking-widest text-slate-400 px-5 py-3 rounded-2xl outline-none focus:border-amber-500/50 transition-all cursor-pointer shadow-xl"
               >
                 <option value="recent">Most Recent</option>
-                <option value="highest">Highest Caliber</option>
-                <option value="lowest">Critical Alerts</option>
-                <option value="helpfulness">Top Intel (Helpful)</option>
+                <option value="highest">Excellence Tier</option>
+                <option value="lowest">Critical Insights</option>
+                <option value="helpfulness">Top Recommended</option>
               </select>
-              <div className="px-3 py-2 bg-whatsapp/10 border border-whatsapp/20 rounded-xl">
-                <span className="text-[10px] font-black text-whatsapp uppercase tracking-widest">{reviews.length} Intel Reports</span>
+              <div className="px-4 py-3 bg-amber-500/5 border border-amber-500/10 rounded-2xl shadow-xl">
+                <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest">{reviews.length} Verified Reviews</span>
               </div>
             </div>
           </div>
 
           {/* Review Form */}
           {currentUser ? (
-            <form onSubmit={handleReviewSubmit} className="bg-slate-900/60 p-6 rounded-[2rem] border border-white/5 space-y-4">
-              <div className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Assign Rating</span>
-                <div className="flex gap-2">
+            <form onSubmit={handleReviewSubmit} className="bg-slate-900/40 p-8 rounded-[3rem] border border-white/5 space-y-6 shadow-2xl relative overflow-hidden">
+              <div className="space-y-3">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Quality Assessment</span>
+                <div className="flex gap-3">
                   {[1, 2, 3, 4, 5].map((s) => (
                     <button
                       key={s}
                       type="button"
                       onClick={() => setReviewRating(s)}
-                      className="p-1 hover:scale-110 transition-transform"
+                      className="p-1 hover:scale-125 transition-transform duration-500"
                     >
-                      <Star className={cn("w-6 h-6 transition-colors", reviewRating >= s ? "text-yellow-500 fill-yellow-500" : "text-slate-700")} />
+                      <Star className={cn("w-7 h-7 transition-all duration-500", reviewRating >= s ? "text-amber-500 fill-amber-500 shadow-amber-500/50" : "text-slate-800")} />
                     </button>
                   ))}
                 </div>
               </div>
-              <div className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Observation Data</span>
+              <div className="space-y-3">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Review Details</span>
                 <textarea
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
-                  placeholder="Share your experience with this hardware..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm focus:border-whatsapp/50 outline-none transition-all h-24 font-medium"
+                  placeholder="Describe your experience with this selection..."
+                  className="w-full bg-slate-950/50 border border-white/5 rounded-[1.5rem] p-6 text-sm focus:border-amber-500/50 outline-none transition-all h-32 font-medium shadow-inner"
                   required
                 />
               </div>
               <button
                 type="submit"
                 disabled={submittingReview}
-                className="w-full bg-whatsapp text-slate-900 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-whatsapp/90 transition-all disabled:opacity-50"
+                className="w-full bg-amber-500 text-slate-950 py-5 rounded-[1.5rem] font-bold uppercase text-[10px] tracking-[0.3em] flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-amber-500/20 disabled:opacity-50"
               >
                 {submittingReview ? (
-                  <div className="w-4 h-4 border-2 border-slate-900/20 border-t-slate-900 rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-slate-950/20 border-t-slate-950 rounded-full animate-spin" />
                 ) : (
-                  <>Submit Intelligence <Send className="w-3 h-3" /></>
+                  <>Submit Review <Send className="w-3 h-3" /></>
                 )}
               </button>
             </form>
           ) : (
-            <div className="bg-slate-900/40 p-12 rounded-[2rem] border border-dashed border-slate-800 text-center space-y-4">
-              <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto">
-                <User className="w-8 h-8 text-slate-600" />
+            <div className="bg-slate-900/20 p-12 rounded-[3.5rem] border border-dashed border-white/5 text-center space-y-6 shadow-inner">
+              <div className="w-20 h-20 bg-slate-900 rounded-[2rem] flex items-center justify-center mx-auto shadow-2xl">
+                <User className="w-10 h-10 text-slate-700" />
               </div>
-              <div className="space-y-1">
-                <h3 className="text-sm font-black uppercase text-slate-100">Authentication Required</h3>
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Sign in to contribute to the mission logs.</p>
+              <div className="space-y-2">
+                <h3 className="text-base font-bold uppercase text-white tracking-tight">Authentication Required</h3>
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed">Sign in to provide your feedback on this collection.</p>
               </div>
-              <Link to="/login" className="inline-block bg-whatsapp/10 border border-whatsapp/20 text-whatsapp px-6 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-whatsapp hover:text-slate-900 transition-all">
+              <Link to="/login" className="inline-block bg-amber-500 text-slate-950 px-10 py-3 rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-amber-500/20">
                 Login
               </Link>
             </div>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             {reviews.map((review) => (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
                 key={review.id}
-                className="bg-slate-900/40 p-6 rounded-[2rem] border border-white/5 space-y-4 group hover:border-whatsapp/20 transition-all"
+                className="bg-slate-900/40 p-8 rounded-[3rem] border border-white/5 space-y-6 group hover:border-amber-500/20 transition-all duration-700 shadow-2xl"
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-slate-800 rounded-xl flex items-center justify-center border border-white/5">
-                      <User className="w-5 h-5 text-slate-600" />
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-slate-950 rounded-2xl flex items-center justify-center border border-white/5 shadow-inner">
+                      <User className="w-6 h-6 text-slate-700" />
                     </div>
-                    <div>
-                      <h4 className="text-[10px] font-black uppercase tracking-tight text-slate-100">{review.user_name}</h4>
-                      <div className="flex gap-0.5">
+                    <div className="space-y-1">
+                      <h4 className="text-[11px] font-bold uppercase tracking-tight text-white">{review.user_name}</h4>
+                      <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map((s) => (
-                          <Star key={s} className={cn("w-2 h-2", review.rating >= s ? "text-whatsapp fill-whatsapp" : "text-slate-800")} />
+                          <Star key={s} className={cn("w-2.5 h-2.5 transition-all duration-700", review.rating >= s ? "text-amber-500 fill-amber-500" : "text-slate-800")} />
                         ))}
                       </div>
                     </div>
@@ -711,21 +722,21 @@ export default function ProductDetails() {
                   <button 
                     onClick={() => handleHelpfulClick(review)}
                     className={cn(
-                      "flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[8px] font-black uppercase tracking-widest transition-all",
+                      "flex items-center gap-2 px-4 py-2 rounded-xl border text-[9px] font-bold uppercase tracking-widest transition-all duration-700",
                       review.helpful_users?.includes(currentUser?.uid)
-                        ? "bg-whatsapp/20 border-whatsapp/50 text-whatsapp shadow-[0_0_15px_rgba(34,197,94,0.2)]"
-                        : "bg-slate-950 border-white/5 text-slate-500 hover:text-slate-300 hover:border-whatsapp/30"
+                        ? "bg-amber-500/20 border-amber-500 text-amber-500 shadow-lg shadow-amber-500/20"
+                        : "bg-slate-950 border-white/5 text-slate-500 hover:text-amber-500 hover:border-amber-500/30 shadow-xl"
                     )}
                   >
-                    <ThumbsUp className={cn("w-3 h-3 transition-transform", !review.helpful_users?.includes(currentUser?.uid) && "group-hover:scale-110")} />
+                    <ThumbsUp className={cn("w-3.5 h-3.5", !review.helpful_users?.includes(currentUser?.uid) && "group-hover:scale-125")} />
                     {review.helpful_count || 0}
                   </button>
                 </div>
-                <div className="space-y-2">
-                  <p className="text-xs text-slate-400 leading-relaxed font-medium">"{review.comment}"</p>
-                  <div className="flex items-center gap-1.5 text-slate-600">
+                <div className="space-y-4">
+                  <p className="text-sm text-slate-400 leading-relaxed font-medium">"{review.comment}"</p>
+                  <div className="flex items-center gap-2 text-slate-600 border-t border-white/5 pt-4">
                     <Clock className="w-3 h-3" />
-                    <span className="text-[8px] font-black uppercase tracking-widest">Report Filed: {review.created_at?.toDate ? new Date(review.created_at.toDate()).toLocaleDateString() : 'Active'}</span>
+                    <span className="text-[9px] font-bold uppercase tracking-[0.2em]">Published: {review.created_at?.toDate ? new Date(review.created_at.toDate()).toLocaleDateString() : 'Just now'}</span>
                   </div>
                 </div>
               </motion.div>
@@ -735,28 +746,29 @@ export default function ProductDetails() {
 
         {/* Related Products Carousel */}
         {relatedProducts.length > 0 && (
-          <div className="space-y-6 pt-12">
+          <div className="space-y-8 pt-16">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-black uppercase italic tracking-tighter">Sync <span className="text-whatsapp">Related</span> Intel</h2>
-              <Link to="/search" className="text-slate-500 text-[10px] font-black uppercase tracking-widest hover:text-whatsapp transition-colors">View All</Link>
+              <h2 className="text-2xl font-bold tracking-tight">Complete <span className="text-amber-500">The Collection</span></h2>
+              <Link to="/search" className="text-amber-500/50 text-[10px] font-bold uppercase tracking-[0.2em] hover:text-amber-500 transition-colors">View Portfolio</Link>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide">
+            <div className="flex gap-6 overflow-x-auto pb-8 px-2 scrollbar-hide">
               {relatedProducts.map((p) => (
                 <Link
                   key={p.id}
                   to={`/product/${p.id}`}
-                  className="flex-shrink-0 w-44 bg-slate-900/60 p-4 rounded-[2rem] border border-white/5 group hover:border-whatsapp/30 transition-all space-y-3"
+                  className="flex-shrink-0 w-56 bg-slate-900/40 p-6 rounded-[2.5rem] border border-white/5 group hover:border-amber-500/30 transition-all duration-1000 space-y-4 shadow-2xl"
                 >
-                  <div className="aspect-square bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center p-4">
+                  <div className="aspect-square bg-slate-950 rounded-[2rem] overflow-hidden flex items-center justify-center p-6 shadow-inner relative">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                     <img
                       src={p.images?.[0]}
                       alt={p.name}
-                      className="w-full h-full object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                      className="w-full h-full object-contain filter brightness-75 group-hover:brightness-100 group-hover:scale-110 transition-all duration-1000"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="text-[10px] font-black uppercase tracking-tighter text-slate-200 line-clamp-1">{p.name}</h3>
-                    <span className="text-xs font-black text-whatsapp italic">{formatCurrency(p.price)}</span>
+                  <div className="space-y-2">
+                    <h3 className="text-[11px] font-bold uppercase tracking-tight text-slate-200 line-clamp-1 group-hover:text-amber-500 transition-colors">{p.name}</h3>
+                    <span className="text-sm font-bold text-amber-500 tracking-tighter">{formatCurrency(p.price)}</span>
                   </div>
                 </Link>
               ))}
@@ -765,15 +777,15 @@ export default function ProductDetails() {
         )}
 
         {/* CTA */}
-        <div className="fixed bottom-6 left-6 right-6 z-40 max-w-md mx-auto space-y-3">
+        <div className="fixed bottom-8 left-8 right-8 z-40 max-w-lg mx-auto space-y-4">
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={handleAddToCart}
             className={cn(
-              "w-full py-4 rounded-[2rem] font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all shadow-xl",
+              "w-full py-5 rounded-[2rem] font-bold uppercase text-[11px] tracking-[0.2em] flex items-center justify-center gap-3 transition-all duration-700 shadow-2xl",
               addedToCart 
-                ? "bg-whatsapp text-slate-900" 
-                : "bg-slate-800 border border-slate-700 text-slate-100 hover:bg-slate-700"
+                ? "bg-amber-500 text-slate-950 shadow-amber-500/30" 
+                : "bg-slate-900 border border-white/10 text-white hover:bg-slate-800 hover:border-amber-500/30"
             )}
           >
             {addedToCart ? (
@@ -782,24 +794,24 @@ export default function ProductDetails() {
                 animate={{ scale: 1, opacity: 1 }}
                 className="flex items-center gap-2"
               >
-                Intelligence Added <Zap className="w-3 h-3 fill-slate-900" />
+                Successfully Added <Zap className="w-4 h-4 fill-slate-950" />
               </motion.div>
             ) : (
-              <>Quick Add to Cart <ShoppingCart className="w-4 h-4" /></>
+              <>Secure Item to Cart <ShoppingCart className="w-5 h-5" /></>
             )}
           </motion.button>
           
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <Link 
               to="/cart"
-              className="flex-[0.3] bg-slate-900/80 border border-white/5 text-slate-400 py-5 rounded-[2rem] font-black uppercase text-[10px] tracking-widest flex items-center justify-center hover:bg-slate-800 transition-all shadow-2xl relative"
+              className="flex-[0.3] bg-slate-950/80 backdrop-blur-xl border border-white/5 text-slate-400 py-6 rounded-[2rem] font-bold uppercase text-[10px] tracking-widest flex items-center justify-center hover:text-amber-500 hover:border-amber-500/20 transition-all shadow-2xl relative"
             >
-              <ShoppingCart className="w-4 h-4" />
+              <ShoppingCart className="w-5 h-5" />
               {addedToCart && (
                 <motion.div 
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 w-4 h-4 bg-whatsapp rounded-full flex items-center justify-center text-[8px] text-slate-900 font-bold"
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-[9px] text-slate-950 font-bold shadow-lg"
                 >
                   !
                 </motion.div>
@@ -807,9 +819,9 @@ export default function ProductDetails() {
             </Link>
             <button
               onClick={handleWhatsAppOrder}
-              className="flex-1 bg-whatsapp text-slate-900 py-5 rounded-[2rem] font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-[0_15px_40px_rgba(34,197,94,0.4)]"
+              className="flex-1 bg-slate-900 border border-white/10 text-white rounded-[2rem] py-6 text-[11px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-3 hover:bg-slate-800 hover:border-amber-500/30 shadow-2xl transition-all"
             >
-              <MessageCircle className="w-5 h-5 fill-slate-900" /> WhatsApp Deploy
+              Inquire via WhatsApp <MessageCircle className="w-5 h-5" />
             </button>
           </div>
         </div>

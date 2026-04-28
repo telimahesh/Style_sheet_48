@@ -4,7 +4,7 @@ import { Send, Bot, Sparkles, MessageSquare, Package, Group, MessageCircle, Copy
 import { HelpingAiService } from '../helping/HelpingAiService';
 import { db } from '../lib/firebase';
 import { collection, query, limit, getDocs } from 'firebase/firestore';
-import { cn } from '@/src/lib/utils';
+import { cn, formatCurrency } from '@/src/lib/utils';
 
 export default function HelpingCenter() {
   const [activeTab, setActiveTab] = useState<'support' | 'auto-messages' | 'product-pitches'>('support');
@@ -57,31 +57,29 @@ export default function HelpingCenter() {
   };
 
   return (
-    <div className="min-h-screen space-y-8 pb-32 animate-in fade-in duration-500">
-      <header className="space-y-2">
+    <div className="min-h-screen space-y-6 pb-24 animate-in fade-in duration-500">
+      <header className="space-y-1">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-whatsapp rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(34,197,94,0.3)]">
-            <Bot className="w-6 h-6 text-slate-900" />
+            <Bot className="w-6 h-6 text-slate-950" />
           </div>
-          <div>
-            <h1 className="text-3xl font-black uppercase italic tracking-tighter text-slate-100">Helping <span className="text-whatsapp">Center</span></h1>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 italic">Advanced AI Operational Support</p>
-          </div>
+          <h1 className="text-2xl font-black italic uppercase tracking-tighter">Helping <span className="text-whatsapp">Center</span></h1>
         </div>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">AI Powered Retail Operations Assistant</p>
       </header>
 
-      {/* Internal Tabs */}
+      {/* Tabs */}
       <div className="flex gap-2 p-1 bg-slate-900 border border-white/5 rounded-2xl">
         {[
-          { id: 'support', icon: <MessageSquare className="w-4 h-4" />, label: 'Customer Service' },
-          { id: 'auto-messages', icon: <Group className="w-4 h-4" />, label: 'Group Automation' },
-          { id: 'product-pitches', icon: <Zap className="w-4 h-4" />, label: 'Asset Pitching' },
+          { id: 'support', icon: <MessageSquare className="w-4 h-4" />, label: 'Customer Support' },
+          { id: 'auto-messages', icon: <Group className="w-4 h-4" />, label: 'Group Messages' },
+          { id: 'product-pitches', icon: <Sparkles className="w-4 h-4" />, label: 'Auto Pitches' },
         ].map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+              "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all",
               activeTab === tab.id ? "bg-whatsapp text-slate-950 shadow-lg" : "text-slate-500 hover:text-slate-300"
             )}
           >
@@ -91,9 +89,9 @@ export default function HelpingCenter() {
         ))}
       </div>
 
-      <div className="bg-slate-900/60 border border-white/5 p-8 rounded-[3rem] shadow-2xl backdrop-blur-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-12 opacity-[0.03]">
-          <Sparkles className="w-64 h-64" />
+      <div className="bg-slate-900/60 border border-white/5 p-6 rounded-3xl backdrop-blur-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
+          <Bot className="w-32 h-32" />
         </div>
 
         <div className="relative z-10">
@@ -107,19 +105,19 @@ export default function HelpingCenter() {
                 className="space-y-8"
               >
                 <div className="space-y-4">
-                  <div className="bg-slate-950 border border-white/5 p-6 rounded-2xl min-h-[200px] flex flex-col">
+                  <div className="bg-slate-950 border border-white/5 p-6 rounded-2xl min-h-[150px] flex flex-col">
                     {response ? (
-                      <div className="space-y-4 flex-1">
+                      <div className="space-y-3 flex-1">
                         <div className="flex items-center gap-2 text-whatsapp">
                           <Bot className="w-4 h-4" />
-                          <span className="text-[10px] font-black uppercase tracking-widest italic">AI Agent Response</span>
+                          <span className="text-[9px] font-black uppercase tracking-widest">HelpingAI Response</span>
                         </div>
-                        <p className="text-sm text-slate-300 leading-relaxed italic">"{response}"</p>
+                        <p className="text-sm text-slate-300 leading-relaxed font-medium">"{response}"</p>
                       </div>
                     ) : (
-                      <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4 opacity-30">
-                        <MessageCircle className="w-12 h-12" />
-                        <p className="text-[10px] font-black uppercase tracking-widest">Awaiting Command Input...</p>
+                      <div className="flex-1 flex flex-col items-center justify-center text-center space-y-2 opacity-20">
+                        <MessageCircle className="w-10 h-10" />
+                        <p className="text-[9px] font-black uppercase tracking-widest">Awaiting Command...</p>
                       </div>
                     )}
                   </div>
@@ -129,30 +127,30 @@ export default function HelpingCenter() {
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSupport()}
-                      placeholder="Transmission: Ask any question about store operations..."
-                      className="flex-1 bg-slate-950 border border-white/5 rounded-2xl py-5 px-8 text-sm focus:outline-none focus:border-whatsapp/50 transition-all font-medium italic"
+                      placeholder="Enter customer query..."
+                      className="flex-1 bg-slate-950 border border-white/5 rounded-xl py-4 px-6 text-xs focus:outline-none focus:border-whatsapp/50 transition-all font-medium"
                     />
                     <button
                       onClick={handleSupport}
                       disabled={loading}
-                      className="bg-whatsapp text-slate-950 p-5 rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                      className="bg-whatsapp text-slate-950 px-6 py-4 rounded-xl shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
                     >
-                      {loading ? <Zap className="w-6 h-6 animate-spin" /> : <Send className="w-6 h-6" />}
+                      {loading ? <Bot className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                     </button>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
-                    "What are your delivery protocols?",
-                    "How do I return a technical asset?",
-                    "Do you have neon peripherals in stock?",
-                    "How to verify tactical hardware?"
+                    "How long does delivery take?",
+                    "What is your return policy?",
+                    "Do you fix keyboards?",
+                    "Where is my order?"
                   ].map(prompt => (
                     <button
                       key={prompt}
                       onClick={() => { setQuery(prompt); }}
-                      className="bg-slate-950/50 border border-white/5 p-4 rounded-xl text-[10px] font-bold text-slate-500 uppercase tracking-widest text-left hover:border-whatsapp/30 transition-all"
+                      className="bg-slate-950/50 border border-white/5 p-3 rounded-xl text-[9px] font-black text-slate-500 uppercase tracking-widest text-left hover:border-whatsapp/30 hover:text-slate-300 transition-all"
                     >
                       {prompt}
                     </button>
@@ -167,11 +165,11 @@ export default function HelpingCenter() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="space-y-8"
+                className="space-y-6"
               >
-                <div className="space-y-4">
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 pl-2">Select Assets for Group Broadcast</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="space-y-3">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500 px-1">Select Products for Status Update</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {products.map(p => (
                       <button
                         key={p.id}
@@ -179,7 +177,7 @@ export default function HelpingCenter() {
                         className={cn(
                           "p-3 rounded-xl border text-[9px] font-black uppercase tracking-tight text-center transition-all",
                           selectedProductIds.includes(p.id) 
-                            ? "bg-whatsapp/20 border-whatsapp text-whatsapp shadow-lg" 
+                            ? "bg-whatsapp/10 border-whatsapp text-whatsapp shadow-lg" 
                             : "bg-slate-950 border-white/5 text-slate-500 hover:border-whatsapp/30"
                         )}
                       >
@@ -193,33 +191,33 @@ export default function HelpingCenter() {
                   <button
                     onClick={handleGenerateGroupMessage}
                     disabled={loading}
-                    className="w-full bg-slate-950 border border-whatsapp/30 text-whatsapp py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-whatsapp hover:text-slate-950 transition-all shadow-xl"
+                    className="w-full bg-slate-950 border border-whatsapp/30 text-whatsapp py-4 rounded-xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-whatsapp hover:text-slate-950 transition-all"
                   >
-                    {loading ? <Zap className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    Generate Group Deployment Message
+                    {loading ? <Bot className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    Generate Group Notice
                   </button>
                 )}
 
-                {groupMessage && (
-                  <div className="bg-slate-950 border border-white/5 p-8 rounded-2xl space-y-4 relative group">
+                {activeTab === 'auto-messages' && groupMessage && (
+                  <div className="bg-slate-950 border border-white/5 p-6 rounded-2xl space-y-4 relative group">
                     <button 
                       onClick={() => copyToClipboard(groupMessage)}
-                      className="absolute top-4 right-4 p-2 bg-slate-900 border border-white/10 rounded-lg text-slate-400 hover:text-whatsapp transition-colors"
+                      className="absolute top-4 right-4 p-2 bg-slate-900 border border-white/10 rounded-lg text-slate-400 hover:text-whatsapp transition-all"
                     >
                       {copied ? <Check className="w-4 h-4 text-whatsapp" /> : <Copy className="w-4 h-4" />}
                     </button>
-                    <div className="flex items-center gap-2 text-whatsapp mb-2">
+                    <div className="flex items-center gap-2 text-whatsapp mb-1">
                       <MessageCircle className="w-4 h-4" />
-                      <span className="text-[10px] font-black uppercase tracking-widest italic">Broadcast Signal</span>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-whatsapp">Draft Message</span>
                     </div>
-                    <p className="text-sm text-slate-300 leading-relaxed italic">{groupMessage}</p>
+                    <p className="text-xs text-slate-400 leading-relaxed font-medium">"{groupMessage}"</p>
                     <a 
                       href={`https://wa.me/?text=${encodeURIComponent(groupMessage)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-[#25D366] text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all mt-4"
+                      className="inline-flex items-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#25D366]/20"
                     >
-                      <MessageCircle className="w-4 h-4" /> Deploy to WhatsApp
+                      <MessageCircle className="w-4 h-4" /> Send to WhatsApp
                     </a>
                   </div>
                 )}
@@ -232,7 +230,7 @@ export default function HelpingCenter() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="space-y-6"
+                className="space-y-4"
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {products.slice(0, 6).map(p => (
@@ -243,13 +241,6 @@ export default function HelpingCenter() {
             )}
           </AnimatePresence>
         </div>
-      </div>
-
-      <div className="flex items-center gap-4 bg-whatsapp/[0.03] border border-whatsapp/20 p-6 rounded-2xl">
-        <AlertCircle className="w-6 h-6 text-whatsapp animate-pulse" />
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
-          Operational Security Warning: AI signals are generated targets. Verify tactical accuracy before public broadcast deployment.
-        </p>
       </div>
     </div>
   );
@@ -274,28 +265,28 @@ function PitchCard({ product }: { product: any; key?: string | number }) {
   };
 
   return (
-    <div className="bg-slate-950 border border-white/5 p-6 rounded-2xl space-y-4 hover:border-whatsapp/30 transition-all group">
+    <div className="bg-slate-950 border border-white/5 p-6 rounded-2xl space-y-4 hover:border-whatsapp/20 transition-all group">
       <div className="flex items-center justify-between">
-        <h4 className="text-[10px] font-black text-slate-200 uppercase tracking-tight">{product.name}</h4>
-        <span className="text-[9px] font-black text-whatsapp italic">${product.price}</span>
+        <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-tight">{product.name}</h4>
+        <span className="text-[10px] font-black text-whatsapp italic">{formatCurrency(product.price)}</span>
       </div>
       
       {pitch ? (
         <div className="space-y-4">
-          <p className="text-[11px] text-slate-400 italic leading-relaxed">"{pitch}"</p>
+          <p className="text-[11px] text-slate-500 font-medium leading-relaxed italic">"{pitch}"</p>
           <div className="flex gap-2">
             <button 
               onClick={copyToClipboard}
-              className="flex-1 bg-slate-900 border border-white/10 text-slate-400 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest hover:text-whatsapp transition-all flex items-center justify-center gap-2"
+              className="flex-1 bg-slate-900 border border-white/10 text-slate-500 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest hover:text-whatsapp hover:border-whatsapp/20 transition-all flex items-center justify-center gap-2"
             >
               {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-              {copied ? 'Captured' : 'Copy'}
+              {copied ? 'Copied' : 'Copy Pitch'}
             </button>
             <a 
               href={`https://wa.me/?text=${encodeURIComponent(pitch)}`}
               target="_blank" 
               rel="noopener noreferrer"
-              className="px-4 bg-[#25D366] text-white rounded-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+              className="px-4 bg-[#25D366] text-white rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
             >
               <MessageCircle className="w-4 h-4" />
             </a>
@@ -305,10 +296,10 @@ function PitchCard({ product }: { product: any; key?: string | number }) {
         <button
           onClick={generatePitch}
           disabled={loading}
-          className="w-full py-3 bg-slate-900 border border-white/10 text-slate-500 rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 group-hover:text-whatsapp group-hover:border-whatsapp/30 transition-all"
+          className="w-full py-3 bg-slate-900 border border-white/10 text-slate-600 rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 group-hover:text-whatsapp group-hover:border-whatsapp/20 transition-all"
         >
-          {loading ? <Zap className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-          Generate Intelligence
+          {loading ? <Bot className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+          Generate Pitch
         </button>
       )}
     </div>
